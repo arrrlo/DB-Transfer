@@ -55,5 +55,13 @@ rt['my_key'] = 'some_string' # redis: "SET" "my_prefix:my_name_space:my_key" "so
 # other data types:
 
 rt['my_key'] = [1,2,3,4] # redis: "RPUSH" "my_prefix:my_name_space:my_key" "1" "2" "3" "4"
-rt['my_key'] = {'foo': 'bar'} # "HMSET" "my_prefix:my_name_space:my_key" "foo" "bar"
+rt['my_key'] = {'foo': 'bar'} # redis: "HMSET" "my_prefix:my_name_space:my_key" "foo" "bar"
+
+
+# using redis pipeline (multiple commands execution, only for set and delete):
+
+with rt:
+    rt['my_key_1'] = 'some_string'
+    rt['my_key_2'] = [1,2,3,4]
+    rt['my_key_3'] = {'foo': 'bar'}
 ```
