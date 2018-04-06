@@ -55,5 +55,5 @@ rt['my_key'] = 'some_string' # redis: "SET" "my_prefix:my_name_space:my_key" "so
 # other data types:
 
 rt['my_key'] = [1,2,3,4] # redis: "RPUSH" "my_prefix:my_name_space:my_key" "1" "2" "3" "4"
-rt['my_key'] = {'foo': 'bar'} # "HMSET" "my_prefix:my_name_space:my_key" "foo" "bar"
+rt['my_key'] = {'foo': 'bar'} # redis: "HMSET" "my_prefix:my_name_space:my_key" "foo" "bar"
 ```
