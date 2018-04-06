@@ -33,8 +33,21 @@ rt['my_key'] = 'some_string' # redis: "SET" "data:my_name_space:my_key" "some_st
 
 rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace', adapter_name='redis')
 rt['my_key'] = 'some_string' # redis: "SET" "my_prefix:my_name_space:my_key" "some_string"
+```
 
+```python
+# fetch data:
 
+my_var = rt['my_key'] # redis: "GET" "my_prefix:my_name_space:my_key"
+```
+
+```python
+# delete data:
+
+del rt['my_key'] # redis: "DEL" "my_prefix:my_name_space:my_key"
+```
+
+```python
 # without environment variables for connecting to database:
 
 class RedisTransfer(Transfer):
@@ -50,14 +63,19 @@ rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace', adapter_name='r
                    host='localhost', port=6379, db=0)
 
 rt['my_key'] = 'some_string' # redis: "SET" "my_prefix:my_name_space:my_key" "some_string"
+```
 
-
+```python
 # other data types:
 
-rt['my_key'] = [1,2,3,4] # redis: "RPUSH" "my_prefix:my_name_space:my_key" "1" "2" "3" "4"
-rt['my_key'] = {'foo': 'bar'} # redis: "HMSET" "my_prefix:my_name_space:my_key" "foo" "bar"
+rt['my_key_1'] = [1,2,3,4] # redis: "RPUSH" "my_prefix:my_name_space:my_key" "1" "2" "3" "4"
+rt['my_key_2'] = {'foo': 'bar'} # redis: "HMSET" "my_prefix:my_name_space:my_key" "foo" "bar"
 
+my_var_1 = rt['my_key_1'] # redis: "LRANGE" "my_prefix:my_name_space:my_key_1" "0" "-1"
+my_var_2 = rt['my_key_2'] # redis: "HGETALL" "my_prefix:my_name_space:my_key_2"
+```
 
+```python
 # using redis pipeline (multiple commands execution, only for set and delete):
 
 with rt:
