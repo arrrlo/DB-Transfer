@@ -1,6 +1,7 @@
 <h1>Python Transfer</h1>
 
-<p>An easy way to fetch and store data from and to key-value databases like Redis.</p>
+<p>An easy way to fetch and store data from and to key-value databases like Redis.<br/>
+It is designed to have number of database adapters, but currently is has only Redis adapter.</p>
 
 <h2>INSTALL (Python 3.x)</h2>
 
