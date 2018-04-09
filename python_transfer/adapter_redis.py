@@ -4,13 +4,6 @@ import ujson
 from python_transfer.adapter import Adapter
 
 
-def num(n):
-    try:
-        return int(n)
-    except ValueError:
-        return n
-
-
 class Redis(Adapter):
     """ Redis adapter.
 
@@ -67,7 +60,11 @@ class Redis(Adapter):
 
         _type = conn.type(key)
         if _type == 'string':
-            return num(conn.get(key))
+            n = conn.get(key)
+            try:
+                return int(n)
+            except ValueError:
+                return n
         elif _type == 'list':
             value = conn.lrange(key, 0, -1)
             lst = []
@@ -78,7 +75,7 @@ class Redis(Adapter):
                     lst.append(itm)
             return lst
         elif _type == 'hash':
-            return conn.hgetall(key)
+            return RedisHash(self, conn, key)
         elif _type == 'set':
             return conn.smembers(key)
 
@@ -189,3 +186,29 @@ class RedisKeys(object):
         if conn is None:
             conn = self._redis_handler.adapter.conn()
         conn.srem(self.key, 0, key)
+
+
+class RedisHash:
+
+    def __init__(self, adapter, conn, key):
+        self._key = key
+        self._conn = conn
+        self._adapter = adapter
+
+    def __getitem__(self, item):
+        if isinstance(item, slice):
+            raise Exception('Not a list')
+        return self._conn.hget(self._key, item)
+
+    def __setitem__(self, item, value):
+        self._conn.hset(self._key, item, value)
+
+    def __iter__(self):
+        for item in self.keys():
+            yield self.__getitem__(item)
+
+    def keys(self):
+        return [item for item in self._conn.hkeys(self._key)]
+
+    def items(self):
+        return [(item, self.__getitem__(item)) for item in self.keys()]

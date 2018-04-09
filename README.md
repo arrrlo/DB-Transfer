@@ -21,7 +21,8 @@ data from key-value database just like dictionaries: python_transfer[key] = valu
 Example: data:USERS:arrrlo:full_name<br/>
 (data is prefix, USERS is namespace and arrrlo:full_name is item)</p>
 
-<h2>Redis Adapter:</h2>
+<h2><img src="https://cdn4.iconfinder.com/data/icons/redis-2/1451/Untitled-2-512.png" width="30" />
+Redis Adapter:</h2>
 
 <h3>Connect to Redis using environment variables</h3>
 
@@ -71,36 +72,80 @@ class RedisTransfer(Transfer):
 
 ```python
 rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
+
 rt['my_key'] = 'some_string' # redis: "SET" "my_prefix:my_name_space:my_key" "some_string"
 ```
 
 <h3>Fetch data</h3>
 
 ```python
+rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
+
 my_var = rt['my_key'] # redis: "GET" "my_prefix:my_namespace:my_key"
 ```
 
 <h3>Delete data</h3>
 
 ```python
+rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
+
 del rt['my_key'] # redis: "DEL" "my_prefix:my_namespace:my_key"
 ```
 
 <h3>Other data types</h3>
 
 ```python
-rt['my_key_1'] = [1,2,3,4] # redis: "RPUSH" "my_prefix:my_namespace:my_key" "1" "2" "3" "4"
-rt['my_key_2'] = {'foo': 'bar'} # redis: "HMSET" "my_prefix:my_namespace:my_key" "foo" "bar"
+rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
+
+rt['my_key_1'] = [1,2,3,4] # redis: "RPUSH" "my_prefix:my_namespace:my_key_1" "1" "2" "3" "4"
+rt['my_key_2'] = {'foo': 'bar'} # redis: "HMSET" "my_prefix:my_namespace:my_key_2" "foo" "bar"
 
 my_var_1 = rt['my_key_1'] # redis: "LRANGE" "my_prefix:my_namespace:my_key_1" "0" "-1"
-my_var_2 = rt['my_key_2'] # redis: "HGETALL" "my_prefix:my_namespace:my_key_2"
+my_var_2 = dict(rt['my_key_2']) # redis: "HGETALL" "my_prefix:my_namespace:my_key_2"
+```
+
+<h3>Redis hash data type</h3>
+
+```python
+rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
+
+rt['my_key'] = {'foo': 'bar'} # redis: "HMSET" "my_prefix:my_namespace:my_key" "foo" "bar"
+
+my_var = dict(rt['my_key']) # redis: "HGETALL" "my_prefix:my_namespace:my_key"
+my_var = rt['my_key']['foo'] # redis: "HGET" "my_prefix:my_namespace:my_key" "foo"
+
+rt['my_key']['boo'] = 'doo' # redis: "HSET" "my_prefix:my_namespace:my_key" "boo" "bar"
 ```
 
 <h3>Using redis pipeline (multiple commands execution, only for set and delete)</h3>
 
 ```python
-with rt:
+with RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0) as rt:
     rt['my_key_1'] = 'some_string'
     rt['my_key_2'] = [1,2,3,4]
     rt['my_key_3'] = {'foo': 'bar'}
+
+# redis:
+#
+# "MULTI"
+# "SET" "my_prefix:my_namespace:my_key_1" "some_string"
+# "RPUSH" "my_prefix:my_namespace:my_key_2" "1" "2" "3" "4"
+# "HMSET" "my_prefix:my_namespace:my_key_3" "foo" "bar"
+# "EXEC"
+```
+
+
+<h3>Using iterators</h3>
+
+```python
+rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
+
+for key, value in iter(rt):
+    # yields key and value of every key starting with my_prefix:my_namespace:
+
+
+rt['my_key'] = {...} # saving a hash data (dict)
+
+for key, value in iter(rt['my_key']):
+    # yields key and value for every HGET in my_prefix:my_namespace:my_key
 ```

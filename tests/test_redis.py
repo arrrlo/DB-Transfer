@@ -44,7 +44,7 @@ def test_redis_write(test_handler_redis):
     assert test_handler_redis['some_key_2:some_key_2'] == 'some_value'
     assert test_handler_redis['some_key_3:some_key_3'] == ['list_element_1', 'list_element_2']
     assert test_handler_redis['some_key_4:some_key_4'] == [['list_element_1', 'list_element_2']]
-    assert test_handler_redis['some_key_5'] == {'key': 'value'}
+    assert dict(test_handler_redis['some_key_5']) == {'key': 'value'}
     assert test_handler_redis['some_key_6'] == [{'key': 'value', 'foo': 'bar'}, {'key': 'value'}]
 
 

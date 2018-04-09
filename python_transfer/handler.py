@@ -122,4 +122,5 @@ class Transfer(MutableMapping):
         return len(self.adapter.keys())
 
     def __iter__(self):
-        return iter(dict(self.adapter.custom_items()))
+        for key in self.adapter.keys():
+            yield self.__getitem__(key)
