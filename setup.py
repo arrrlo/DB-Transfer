@@ -17,7 +17,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'datahandler=python_transfer.cli:cli'
+            'pythontransfer=python_transfer.cli:cli'
         ],
     },
 )
