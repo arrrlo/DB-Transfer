@@ -48,10 +48,10 @@ rt = RedisTransfer()
 rt['my_key'] = 'some_string' # redis: "SET" "data:my_key" "some_string"
 
 rt = RedisTransfer(namespace='my_namespace')
-rt['my_key'] = 'some_string' # redis: "SET" "data:my_name_space:my_key" "some_string"
+rt['my_key'] = 'some_string' # redis: "SET" "data:my_namespace:my_key" "some_string"
 
 rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace')
-rt['my_key'] = 'some_string' # redis: "SET" "my_prefix:my_name_space:my_key" "some_string"
+rt['my_key'] = 'some_string' # redis: "SET" "my_prefix:my_namespace:my_key" "some_string"
 ```
 
 <h3>Connect to Redis using class parameters</h3>
