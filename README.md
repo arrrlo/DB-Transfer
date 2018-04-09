@@ -37,7 +37,7 @@ os.environ['REDIS_DB'] = '0'
 @sent_env('redis', 'DB', 'REDIS_DB')
 class RedisTransfer(Transfer):
 
-    def __init__(self, prefix, namespace):
+    def __init__(self, prefix=None, namespace=None):
         super().__init__(prefix=str(prefix), namespace=namespace, adapter_name='redis')
 ```
 
