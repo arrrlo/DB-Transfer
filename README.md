@@ -77,23 +77,23 @@ rt['my_key'] = 'some_string' # redis: "SET" "my_prefix:my_name_space:my_key" "so
 <h3>Fetch data</h3>
 
 ```python
-my_var = rt['my_key'] # redis: "GET" "my_prefix:my_name_space:my_key"
+my_var = rt['my_key'] # redis: "GET" "my_prefix:my_namespace:my_key"
 ```
 
 <h3>Delete data</h3>
 
 ```python
-del rt['my_key'] # redis: "DEL" "my_prefix:my_name_space:my_key"
+del rt['my_key'] # redis: "DEL" "my_prefix:my_namespace:my_key"
 ```
 
 <h3>Other data types</h3>
 
 ```python
-rt['my_key_1'] = [1,2,3,4] # redis: "RPUSH" "my_prefix:my_name_space:my_key" "1" "2" "3" "4"
-rt['my_key_2'] = {'foo': 'bar'} # redis: "HMSET" "my_prefix:my_name_space:my_key" "foo" "bar"
+rt['my_key_1'] = [1,2,3,4] # redis: "RPUSH" "my_prefix:my_namespace:my_key" "1" "2" "3" "4"
+rt['my_key_2'] = {'foo': 'bar'} # redis: "HMSET" "my_prefix:my_namespace:my_key" "foo" "bar"
 
-my_var_1 = rt['my_key_1'] # redis: "LRANGE" "my_prefix:my_name_space:my_key_1" "0" "-1"
-my_var_2 = rt['my_key_2'] # redis: "HGETALL" "my_prefix:my_name_space:my_key_2"
+my_var_1 = rt['my_key_1'] # redis: "LRANGE" "my_prefix:my_namespace:my_key_1" "0" "-1"
+my_var_2 = rt['my_key_2'] # redis: "HGETALL" "my_prefix:my_namespace:my_key_2"
 ```
 
 <h3>Using redis pipeline (multiple commands execution, only for set and delete)</h3>
