@@ -205,7 +205,7 @@ class RedisHash:
 
     def __iter__(self):
         for item in self.keys():
-            yield self.__getitem__(item)
+            yield (item, self.__getitem__(item))
 
     def keys(self):
         return [item for item in self._conn.hkeys(self._key)]

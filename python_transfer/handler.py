@@ -123,4 +123,4 @@ class Transfer(MutableMapping):
 
     def __iter__(self):
         for key in self.adapter.keys():
-            yield self.__getitem__(key)
+            yield (key, self.__getitem__(key))
