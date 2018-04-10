@@ -15,7 +15,7 @@ def fake_redis(monkeypatch):
 
 
 @pytest.fixture()
-def test_handler_redis(fake_redis):
+def redis_handler(fake_redis):
     os.environ['test_host_1'] = 'localhost'
     os.environ['test_port_1'] = '6379'
     os.environ['test_db_1'] = '0'
@@ -26,35 +26,50 @@ def test_handler_redis(fake_redis):
     class TestHandlerRedis_1(Transfer):
         pass
 
-    test_handler_redis = TestHandlerRedis_1(namespace='namespace_1', adapter_name='redis')
+    redis_handler = TestHandlerRedis_1(namespace='namespace_1', adapter_name='redis')
 
-    return test_handler_redis
-
-
-def test_redis_write(test_handler_redis):
-    with test_handler_redis:
-        test_handler_redis['some_key_1'] = 'some_value'
-        test_handler_redis['some_key_2:some_key_2'] = 'some_value'
-        test_handler_redis['some_key_3:some_key_3'] = ['list_element_1', 'list_element_2']
-        test_handler_redis['some_key_4:some_key_4'] = [['list_element_1', 'list_element_2']]
-        test_handler_redis['some_key_5'] = {'key': 'value'}
-        test_handler_redis['some_key_6'] = [{'key': 'value', 'foo': 'bar'}, {'key': 'value'}]
-
-    assert test_handler_redis['some_key_1'] == 'some_value'
-    assert test_handler_redis['some_key_2:some_key_2'] == 'some_value'
-    assert test_handler_redis['some_key_3:some_key_3'] == ['list_element_1', 'list_element_2']
-    assert test_handler_redis['some_key_4:some_key_4'] == [['list_element_1', 'list_element_2']]
-    assert dict(test_handler_redis['some_key_5']) == {'key': 'value'}
-    assert test_handler_redis['some_key_6'] == [{'key': 'value', 'foo': 'bar'}, {'key': 'value'}]
+    return redis_handler
 
 
-def test_redis_delete(test_handler_redis):
-    with test_handler_redis:
-        test_handler_redis['some_key_1'] = 'some_value'
+def test_redis_write(redis_handler):
+    redis_handler['some_key_1'] = 'some_value'
+    redis_handler['some_key_2:some_key_2'] = 'some_value'
+    redis_handler['some_key_3:some_key_3'] = ['list_element_1', 'list_element_2']
 
-    assert test_handler_redis['some_key_1'] == 'some_value'
+    with redis_handler:
+        redis_handler['some_key_4:some_key_4'] = [['list_element_1', 'list_element_2']]
+        redis_handler['some_key_5'] = {'key': 'value'}
+        redis_handler['some_key_6'] = [{'key': 'value', 'foo': 'bar'}, {'key': 'value'}]
 
-    with test_handler_redis:
-        del test_handler_redis['some_key_1']
+    assert redis_handler['some_key_1'] == 'some_value'
+    assert redis_handler['some_key_2:some_key_2'] == 'some_value'
+    assert redis_handler['some_key_3:some_key_3'] == ['list_element_1', 'list_element_2']
+    assert redis_handler['some_key_4:some_key_4'] == [['list_element_1', 'list_element_2']]
+    assert dict(redis_handler['some_key_5']) == {'key': 'value'}
+    assert redis_handler['some_key_6'] == [{'key': 'value', 'foo': 'bar'}, {'key': 'value'}]
 
-    assert test_handler_redis['some_key_1'] is None
+
+def test_redis_delete(redis_handler):
+    redis_handler['some_key_1'] = 'some_value'
+    assert redis_handler['some_key_1'] == 'some_value'
+
+    del redis_handler['some_key_1']
+    assert redis_handler['some_key_1'] is None
+
+
+def test_redis_hash(redis_handler):
+    test_dict = {'foo': 'bar', 'doo': {'goo': 'gar'}, 'zoo': [1, 2, 3, {'foo': 'bar'}]}
+    redis_handler['hash_key'] = test_dict
+
+    assert dict(redis_handler['hash_key']) == test_dict
+    assert redis_handler['hash_key']['foo'] == test_dict['foo']
+    assert redis_handler['hash_key']['doo'] == test_dict['doo']
+    assert redis_handler['hash_key']['zoo'] == test_dict['zoo']
+
+
+def test_redis_hash_iterator(redis_handler):
+    test_dict = {'foo': 'bar', 'doo': {'goo': 'gar'}, 'zoo': [1, 2, 3, {'foo': 'bar'}]}
+    redis_handler['hash_key'] = test_dict
+
+    for key, value in redis_handler['hash_key']:
+        assert test_dict[key] == value

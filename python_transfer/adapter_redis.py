@@ -90,17 +90,21 @@ class Redis(Adapter):
         if type(value) is str or type(value) is int:
             conn.set(key, value)
         elif type(value) is list and value:
-            # lst = self.get(item) or []
             lst = []
             for itm in value:
                 if type(itm) == list or type(itm) == dict:
                     lst.append(ujson.dumps(itm))
                 else:
                     lst.append(itm)
-            # conn.delete(key)
             conn.rpush(key, *lst)
         elif type(value) is dict and value:
-            conn.hmset(key, value)
+            dct = {}
+            for k, val in value.items():
+                if type(val) == list or type(val) == dict:
+                    dct[k] = ujson.dumps(val)
+                else:
+                    dct[k] = val
+            conn.hmset(key, dct)
 
         self.__keys.add(item, conn)
 
@@ -196,11 +200,14 @@ class RedisHash:
         self._adapter = adapter
 
     def __getitem__(self, item):
-        if isinstance(item, slice):
-            raise Exception('Not a list')
-        return self._conn.hget(self._key, item)
+        try:
+            return ujson.loads(self._conn.hget(self._key, item))
+        except:
+            return self._conn.hget(self._key, item)
 
     def __setitem__(self, item, value):
+        if type(val) == list or type(val) == dict:
+            value = ujson.dumps(value)
         self._conn.hset(self._key, item, value)
 
     def __iter__(self):
