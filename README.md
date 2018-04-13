@@ -98,10 +98,12 @@ del rt['my_key'] # redis: "DEL" "my_prefix:my_namespace:my_key"
 rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
 
 rt['my_key_1'] = [1,2,3,4] # redis: "RPUSH" "my_prefix:my_namespace:my_key_1" "1" "2" "3" "4"
-rt['my_key_2'] = {'foo': 'bar'} # redis: "HMSET" "my_prefix:my_namespace:my_key_2" "foo" "bar"
+rt['my_key_2'] = {'foo', 'bar'} # redis: "SADD" "my_prefix:my_namespace:my_key_2" "foo" "bar"
+rt['my_key_3'] = {'foo': 'bar'} # redis: "HMSET" "my_prefix:my_namespace:my_key_3" "foo" "bar"
 
-my_var_1 = rt['my_key_1'] # redis: "LRANGE" "my_prefix:my_namespace:my_key_1" "0" "-1"
-my_var_2 = dict(rt['my_key_2']) # redis: "HGETALL" "my_prefix:my_namespace:my_key_2"
+my_var_1 = list(rt['my_key_1']) # redis: "LRANGE" "my_prefix:my_namespace:my_key_1" "0" "-1"
+my_var_2 = set(rt['my_key_2']) # redis: "SMEMBERS" "my_prefix:my_namespace:my_key_2"
+my_var_3 = dict(rt['my_key_2']) # redis: "HGETALL" "my_prefix:my_namespace:my_key_3"
 ```
 
 <h3>Redis hash data type</h3>
@@ -117,7 +119,7 @@ my_var = rt['my_key']['foo'] # redis: "HGET" "my_prefix:my_namespace:my_key" "fo
 rt['my_key']['boo'] = 'doo' # redis: "HSET" "my_prefix:my_namespace:my_key" "boo" "bar"
 ```
 
-<h3>Using redis pipeline (multiple commands execution, only for set and delete)</h3>
+<h3>Multiple commands execution with context manager (only for set and delete)</h3>
 
 ```python
 with RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0) as rt:

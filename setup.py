@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='Python Transfer',
     description='An easy way to fetch and store data from and to key-value databases like Redis.',
-    version="0.2",
+    version="0.3",
     url='https://github.com/arrrlo/python-transfer',
 
     author='Ivan Arar',

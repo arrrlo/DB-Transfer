@@ -1,1 +1,1 @@
-from python_transfer.handler import Transfer
+from python_transfer.transfer import Transfer

@@ -12,19 +12,18 @@ class Redis(Adapter):
 
     connection = {}
 
-    def __init__(self, data_handler=None):
-        self.data_handler = data_handler
+    def __init__(self, transfer=None):
+        self._transfer = transfer
         self.HOST = None
         self.PORT = None
         self.DB = None
-        self._keys = None
         self.context_entered(False)
         self._pipeline = None
 
     def connect(self, host=None, port=None, db=None):
-        self.HOST = host or self.data_handler.get_env('HOST')
-        self.PORT = port or self.data_handler.get_env('PORT')
-        self.DB = db or self.data_handler.get_env('DB')
+        self.HOST = host or self._transfer.get_env('HOST')
+        self.PORT = port or self._transfer.get_env('PORT')
+        self.DB = db or self._transfer.get_env('DB')
 
         conn_key = str(self.HOST) + str(self.PORT) + str(self.DB)
         if not self.connection.get(conn_key):
@@ -35,20 +34,15 @@ class Redis(Adapter):
         return self.connection[conn_key]
 
     @property
-    def __keys(self):
-        if not self._keys:
-            self._keys = RedisKeys(self.data_handler)
-        return self._keys
+    def _keys(self):
+        return RedisKeys(self._transfer)
 
     def contains(self, item):
-        key = Redis.key(self.data_handler, item)
+        key = Redis.key(self._transfer, item)
         return self.conn().exists(key)
 
     def conn_and_key(self, item):
-        if self.data_handler is not None:
-            key = Redis.key(self.data_handler, item)
-        else:
-            key = item
+        key = Redis.key(self._transfer, item)
         conn = self.conn()
         return conn, key
 
@@ -59,25 +53,17 @@ class Redis(Adapter):
             return None
 
         _type = conn.type(key)
+
         if _type == 'string':
-            n = conn.get(key)
-            try:
-                return int(n)
-            except ValueError:
-                return n
+            return String(self, item)
         elif _type == 'list':
-            value = conn.lrange(key, 0, -1)
-            lst = []
-            for itm in value:
-                if len(itm) > 0 and (itm[0] in ['[', '{']) and itm[-1] in [']', '}']:
-                    lst.append(ujson.loads(itm))
-                else:
-                    lst.append(itm)
-            return lst
+            return List(self, item)
         elif _type == 'hash':
-            return RedisHash(self, conn, key)
+            return Hash(self, item)
         elif _type == 'set':
-            return conn.smembers(key)
+            return Set(self, item)
+        else:
+            raise Exception('Unknown data type to fetch')
 
     def set(self, item, value):
         conn, key = self.conn_and_key(item)
@@ -87,26 +73,40 @@ class Redis(Adapter):
                 self._pipeline = conn.pipeline()
             conn = self._pipeline
 
-        if type(value) is str or type(value) is int:
+        if type(value) in [str, int, None, True, False]:
             conn.set(key, value)
-        elif type(value) is list and value:
+
+        elif type(value) in [list, tuple]:
             lst = []
             for itm in value:
-                if type(itm) == list or type(itm) == dict:
+                if type(itm) in [list, set, dict]:
                     lst.append(ujson.dumps(itm))
                 else:
                     lst.append(itm)
             conn.rpush(key, *lst)
-        elif type(value) is dict and value:
+
+        elif type(value) is dict:
             dct = {}
             for k, val in value.items():
-                if type(val) == list or type(val) == dict:
+                if type(val) in [list, set, dict]:
                     dct[k] = ujson.dumps(val)
                 else:
                     dct[k] = val
             conn.hmset(key, dct)
 
-        self.__keys.add(item, conn)
+        elif type(value) is set:
+            lst = []
+            for itm in value:
+                if type(itm) in [list, set, dict]:
+                    lst.append(ujson.dumps(itm))
+                else:
+                    lst.append(itm)
+            conn.sadd(key, *lst)
+
+        else:
+            raise Exception('Unknown data type to save')
+
+        self._keys.add(item, conn)
 
     def delete(self, item):
         conn, key = self.conn_and_key(item)
@@ -117,10 +117,10 @@ class Redis(Adapter):
             conn = self._pipeline
 
         conn.delete(key)
-        self.__keys.remove(item, conn)
+        self._keys.remove(item)
 
     def flush(self):
-        self.conn().delete(self.data_handler.prefix)
+        self.conn().delete(self._transfer.prefix)
 
     def __getitem__(self, key):
         return self.get(key)
@@ -140,16 +140,8 @@ class Redis(Adapter):
         self._pipeline = None
         self.context_entered(False)
 
-    def keys(self, full_key=False):
-        keyset = []
-        if full_key:
-            key_prefix = Redis.key_prefix(self.data_handler) + ':'
-        for k in self.__keys.all:
-            if full_key:
-                keyset.append(key_prefix + k)
-            else:
-                keyset.append(k)
-        return keyset
+    def keys(self):
+        return self._keys.all()
 
     def custom_items(self, keys=None):
         data = []
@@ -160,7 +152,7 @@ class Redis(Adapter):
         return data
 
 
-class RedisKeys(object):
+class RedisKeys:
     """ Used only for handling keys in Redis adapter
 
     Redis KEYS command is very dangerous to use in production environment,
@@ -168,36 +160,104 @@ class RedisKeys(object):
     are stored as set.
     """
 
-    KEYS = 'keys'
-
-    def __init__(self, redis_handler):
-        self._redis_handler = redis_handler
+    def __init__(self, transfer):
+        self._transfer = transfer
 
     @property
-    def key(self):
-        return self._redis_handler.adapter.key_prefix(self._redis_handler) + ':' + self.KEYS
+    def prefix(self):
+        return self._transfer.adapter.key_prefix(self._transfer)
 
-    @property
-    def all(self):
-        return self._redis_handler.adapter.conn().smembers(self.key)
+    def all(self, start_key=None):
+        def search_keys(k, keyset):
+            if k:
+                search_key = prefix + ':' + k
+            else:
+                search_key = prefix
 
-    def add(self, key, conn=None):
+            for key in conn.smembers(search_key):
+                if k:
+                    key = k + ':' + key
+                if key[-5:] == ':keys':
+                    keyset = search_keys(key[:-5], keyset)
+                else:
+                    keyset.append(key)
+            return keyset
+
+        conn = self._transfer.adapter.conn()
+        prefix = self._transfer.adapter.key_prefix(self._transfer)
+
+        keyset = search_keys(start_key, [])
+
+        return sorted(keyset)
+
+    def add(self, item, conn=None):
         if conn is None:
-            conn = self._redis_handler.adapter.conn()
-        conn.sadd(self.key, key)
+            conn = self._transfer.adapter.conn()
 
-    def remove(self, key, conn=None):
-        if conn is None:
-            conn = self._redis_handler.adapter.conn()
-        conn.srem(self.key, 0, key)
+        prefix = self.prefix
+        splitted_item = item.split(':')
+
+        with conn.pipeline() as pipe:
+            while splitted_item:
+                sufix = splitted_item.pop(0)
+                if splitted_item:
+                    pipe.sadd(prefix, sufix + ':keys')
+                else:
+                    pipe.sadd(prefix, sufix)
+                prefix += ':' + sufix
+            pipe.execute()
+
+    def remove(self, item):
+        conn = self._transfer.adapter.conn()
+        prefix = self.prefix + ':' + item
+        key = ':'.join(prefix.split(':')[:-1])
+        conn.srem(key, item.split(':')[-1])
 
 
-class RedisHash:
+class RedisDataType:
 
-    def __init__(self, adapter, conn, key):
-        self._key = key
-        self._conn = conn
+    def __init__(self, adapter, item):
+        self._item = item
         self._adapter = adapter
+        self._conn, self._key = adapter.conn_and_key(item)
+
+    def keys(self):
+        try:
+            return list(self._adapter._keys.all(self._item))
+        except redis.exceptions.ResponseError:
+            return list()
+
+
+class String(RedisDataType):
+
+    def __str__(self):
+        _str = self._conn.get(self._key)
+        try:
+            return int(_str)
+        except ValueError:
+            return str(_str)
+
+    __repr__ = __str__
+
+
+class List(RedisDataType):
+
+    def __iter__(self):
+        value = list(self._conn.lrange(self._key, 0, -1))
+        for itm in value:
+            try:
+                yield ujson.loads(itm)
+            except:
+                yield itm
+
+
+class Hash(RedisDataType):
+
+    def keys(self):
+        return [item for item in self._conn.hkeys(self._key)]
+
+    def items(self):
+        return [(item, self.__getitem__(item)) for item in self.keys()]
 
     def __getitem__(self, item):
         try:
@@ -214,8 +274,13 @@ class RedisHash:
         for item in self.keys():
             yield (item, self.__getitem__(item))
 
-    def keys(self):
-        return [item for item in self._conn.hkeys(self._key)]
 
-    def items(self):
-        return [(item, self.__getitem__(item)) for item in self.keys()]
+class Set(RedisDataType):
+
+    def __iter__(self):
+        value = list(self._conn.smembers(self._key))
+        for itm in value:
+            try:
+                yield ujson.loads(itm)
+            except:
+                yield itm

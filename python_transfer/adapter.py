@@ -7,27 +7,27 @@ class Adapter(object):
     _connection = {}
 
     @staticmethod
-    def key_prefix(data_handler):
-        if not data_handler.namespace:
-            return data_handler.prefix
+    def key_prefix(transfer):
+        if not transfer.namespace:
+            return transfer.prefix
         else:
-            return data_handler.prefix + ':' + data_handler.namespace
+            return transfer.prefix + ':' + transfer.namespace
 
     def conn(self, *args, **kwargs):
-        key = Adapter.key_prefix(self.data_handler) + ':' + self.data_handler.adapter_name
+        key = Adapter.key_prefix(self._transfer) + ':' + self._transfer.adapter_name
         if not Adapter._connection.get(key):
             Adapter._connection[key] = self.connect(*args, **kwargs)
         return Adapter._connection[key]
 
     @staticmethod
-    def key(data_handler, item=None):
-        key = Adapter.key_prefix(data_handler)
+    def key(transfer, item=None):
+        key = Adapter.key_prefix(transfer)
         if item is not None:
             key += ':' + str(item)
         return key
 
     @staticmethod
-    def store(data_handler, file_contents=None):
+    def store(transfer, file_contents=None):
         global key
         global contents
 
