@@ -1,4 +1,4 @@
-<h1>Transfer</h1>
+<h1>DB Transfer</h1>
 
 [![PyPI version](https://badge.fury.io/py/DB-Transfer.svg)](https://badge.fury.io/py/DB-Transfer)
 
