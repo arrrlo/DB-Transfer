@@ -21,7 +21,7 @@ data from key-value database just like dictionaries: python_transfer[key] = valu
 Example: data:USERS:arrrlo:full_name<br/>
 (data is prefix, USERS is namespace and arrrlo:full_name is item)</p>
 
-<h2><img src="https://cdn4.iconfinder.com/data/icons/redis-2/1451/Untitled-2-512.png" width="30" />
+<h2><img src="https://cdn4.iconfinder.com/data/icons/redis-2/1451/Untitled-2-512.png" width="20" style="margin-right: 20px;" />
 Redis Adapter:</h2>
 
 <h3>Connect to Redis using environment variables</h3>
