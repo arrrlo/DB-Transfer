@@ -151,3 +151,70 @@ rt['my_key'] = {...} # saving a hash data (dict)
 for key, value in iter(rt['my_key']):
     # yields key and value for every HGET in my_prefix:my_namespace:my_key
 ```
+
+
+<h3>Keys</h3>
+
+<p>Every key in Redis is stored in set in same Redis.<br/>
+Example:</p>
+
+```python
+rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
+
+rt['key_1'] = 'value'
+rt['key_2:key3'] = 'value'
+rt['key_2:key4'] = 'value'
+rt['key_2:key_5:key_6'] = 'value'
+rt['key_2:key_5:key_7'] = 'value'
+rt['key_2:key_5:key_8'] = 'value'
+```
+
+<p>So, the keys are "key_1", "key_2:key3", "key_2:key4", "key_2:key5:key_6", "key_2:key5:key_7", "key_2:key5:key_8".<br/>
+They are not stored in one set, but different keys are stored i different sets:<br/>
+'my_prefix:my_namespace': set({'key_1', 'key_2:keys'})<br/>
+'my_prefix:my_namespace:key_2': set({'key_3', 'key_4', 'key_5:keys'})<br/>
+'my_prefix:my_namespace:key_2:key_5': set({'key_6', 'key_7', 'key_8'})<br/><br/>
+
+This is done this way so you can easily access data by keys fom any level recursively:</p>
+
+
+```python
+rt.keys()
+# > ['key_1', 'key_2:key3', 'key_2:key4', 'key_2:key_5:key_6', 'key_2:key_5:key_7', 'key_2:key_5:key_8']
+
+rt['key_2'].keys()
+# > ['key_3', 'key_4', 'key_5:key_6', 'key_5:key_7', 'key_5:key_8']
+
+rt['key_2:key_5'].keys()
+# > ['key_6', 'key_7', 'key_8']
+```
+
+
+<h3>Real life examples</h3>
+
+<p>Transfer all data from one Redis database to another:</p>
+
+```python
+rt_1 = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
+rt_2 = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='some_host', port=6379, db=0)
+
+for key in rt_1.keys():
+    rt_2[key] = rt_1[key]
+```
+
+<p>or if you want to insert data in one batch (read goes one by one):</p>
+
+```python
+with rt_2:
+    for key in rt_1.keys():
+        rt_2[key] = rt_1[key]
+```
+
+<p>Transfer data from one user to another:</p>
+
+```python
+rt_1 = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
+
+for key in rt_1['arrrlo'].keys():
+    rt_1['edi:' + key] = rt_1['arrrlo:' + key]
+```
