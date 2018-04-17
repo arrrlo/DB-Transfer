@@ -218,3 +218,13 @@ rt_1 = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localho
 for key in rt_1['arrrlo'].keys():
     rt_1['edi:' + key] = rt_1['arrrlo:' + key]
 ```
+
+<p>Delete user from database:</p>
+
+```python
+rt_1 = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
+
+with rt_1:
+    for key in rt_1['arrrlo'].keys():
+        del rt_1['arrrlo:' + key]
+```
