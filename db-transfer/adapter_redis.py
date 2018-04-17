@@ -1,7 +1,7 @@
 import redis
 import ujson
 
-from python_transfer.adapter import Adapter
+from db_transfer.adapter import Adapter
 
 
 class Redis(Adapter):

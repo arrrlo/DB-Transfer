@@ -1,4 +1,6 @@
-<h1>Python Transfer</h1>
+<h1>Transfer</h1>
+
+[![PyPI version](https://badge.fury.io/py/DB-Transfer.svg)](https://badge.fury.io/py/DB-Transfer)
 
 <p>An easy way to manipulate data using key-value databases like Redis.<br/>
 It is designed to support a number of databases, but currently only Redis is supported.</p>
@@ -6,14 +8,14 @@ It is designed to support a number of databases, but currently only Redis is sup
 <h2>INSTALL (Python 3.x)</h2>
 
 ```bash
-pip install git+git://github.com/arrrlo/python-transfer@master
+pip install DB-Transfer
 ```
 
 <h2>Design</h2>
 
 <p>There are an adapter class for every database.<br/>
 After instantiating Python Transfer using certain adapter_name, we can manipulate the<br/>
-data from key-value database just like dictionaries: python_transfer[key] = value</p>
+data from key-value database just like dictionaries: transfer[key] = value</p>
 
 <h2>Keys</h2>
 
@@ -27,7 +29,7 @@ Redis Adapter:</h2>
 <h3>Connect to Redis using environment variables</h3>
 
 ```python
-from python_transfer import Transfer, sent_env
+from db_transfer import Transfer, sent_env
 
 os.environ['REDIS_HOST'] = 'localhost'
 os.environ['REDIS_PORT'] = '6379'

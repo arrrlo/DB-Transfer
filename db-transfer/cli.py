@@ -1,6 +1,6 @@
 import click
 
-from python_transfer import Transfer
+from db_transfer import Transfer
 
 
 @click.group()

@@ -2,8 +2,8 @@ import os
 import pytest
 import fakeredis
 
-from python_transfer.adapter_redis import Redis
-from python_transfer.transfer import Transfer, sent_env
+from db_transfer.adapter_redis import Redis
+from db_transfer.transfer import Transfer, sent_env
 
 
 @pytest.fixture()
