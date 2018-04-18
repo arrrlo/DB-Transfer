@@ -27,6 +27,7 @@ Example: data:USERS:arrrlo:full_name<br/>
 Redis Adapter:</h2>
 
 <h3>Connect to Redis using environment variables</h3>
+<p>Very handy when using in docker containers.</p>
 
 ```python
 from db_transfer import Transfer, sent_env
