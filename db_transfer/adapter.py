@@ -8,23 +8,28 @@ class Adapter(object):
 
     @staticmethod
     def key_prefix(transfer):
-        if not transfer.namespace:
-            return transfer.prefix
-        else:
-            return transfer.prefix + ':' + transfer.namespace
-
-    def conn(self, *args, **kwargs):
-        key = Adapter.key_prefix(self._transfer) + ':' + self._transfer.adapter_name
-        if not Adapter._connection.get(key):
-            Adapter._connection[key] = self.connect(*args, **kwargs)
-        return Adapter._connection[key]
+        prefix_list = []
+        if transfer.namespace:
+            prefix_list.append(transfer.prefix)
+        if transfer.namespace:
+            prefix_list.append(transfer.namespace)
+        return ':'.join(prefix_list)
 
     @staticmethod
     def key(transfer, item=None):
-        key = Adapter.key_prefix(transfer)
-        if item is not None:
-            key += ':' + str(item)
-        return key
+        key_list = []
+        prefix = Adapter.key_prefix(transfer)
+        if prefix:
+            key_list.append(prefix)
+        if item:
+            key_list.append(item)
+        return ':'.join(key_list)
+
+    def conn(self, *args, **kwargs):
+        key = Adapter.key(self._transfer, self._transfer.adapter_name)
+        if not Adapter._connection.get(key):
+            Adapter._connection[key] = self.connect(*args, **kwargs)
+        return Adapter._connection[key]
 
     @staticmethod
     def store(transfer, file_contents=None):
