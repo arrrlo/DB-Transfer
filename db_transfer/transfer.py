@@ -1,5 +1,10 @@
 import os
-from collections import MutableMapping
+import six
+
+if six.PY2:
+    from UserDict import DictMixin
+elif six.PY3:
+    from collections import MutableMapping as DictMixin
 
 from db_transfer.adapter_redis import Redis
 
@@ -42,7 +47,7 @@ class sent_env:
         return data_handler_class
 
 
-class Transfer(MutableMapping):
+class Transfer(DictMixin):
     """ Main class with wich the data handling object is instantiated.
 
     It is a MutableMapping and a factory.

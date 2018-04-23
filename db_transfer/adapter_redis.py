@@ -243,12 +243,20 @@ class String(RedisDataType):
 class List(RedisDataType):
 
     def __iter__(self):
-        value = list(self._conn.lrange(self._key, 0, -1))
-        for itm in value:
+        self._values = list(self._conn.lrange(self._key, 0, -1))
+        return self
+
+    def __next__(self):
+        try:
+            value = self._values.pop(0)
             try:
-                yield ujson.loads(itm)
+                return ujson.loads(value)
             except:
-                yield itm
+                return value
+        except IndexError:
+            raise StopIteration()
+
+    next = __next__
 
 
 class Hash(RedisDataType):
@@ -271,16 +279,33 @@ class Hash(RedisDataType):
         self._conn.hset(self._key, item, value)
 
     def __iter__(self):
-        for item in self.keys():
-            yield (item, self.__getitem__(item))
+        self._keys = self.keys()
+        return self
+
+    def __next__(self):
+        try:
+            item = self._keys.pop(0)
+            return (item, self.__getitem__(item))
+        except IndexError:
+            raise StopIteration()
+
+    next = __next__
 
 
 class Set(RedisDataType):
 
     def __iter__(self):
-        value = list(self._conn.smembers(self._key))
-        for itm in value:
+        self._values = list(self._conn.smembers(self._key))
+        return self
+
+    def __next__(self):
+        try:
+            value = self._values.pop(0)
             try:
-                yield ujson.loads(itm)
+                return ujson.loads(value)
             except:
-                yield itm
+                return value
+        except IndexError:
+            raise StopIteration()
+
+    next = __next__
