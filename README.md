@@ -5,7 +5,7 @@
 <p>An easy way to manipulate data using key-value databases like Redis.<br/>
 It is designed to support a number of databases, but currently only Redis is supported.</p>
 
-<h2>INSTALL (Python 3.x)</h2>
+<h2>INSTALL</h2>
 
 ```bash
 pip install DB-Transfer
