@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name='DB Transfer',
-    version="1.0.0",
+    version="0.4.3",
 
     description='An easy way to fetch and store data from and store to key-value databases like Redis.',
     long_description=readme(),
@@ -25,7 +25,8 @@ setup(
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.6',
     ],
     keywords='database, redis, transfer, migration',
 
