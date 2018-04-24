@@ -15,7 +15,7 @@ ADAPTER_CLASSES = {
 }
 
 
-class sent_env:
+class sent_env(object):
     """ Decorator class for setting the connection params.
 
     DataHandler needs connection to the database.
@@ -47,7 +47,7 @@ class sent_env:
         return data_handler_class
 
 
-class Transfer(DictMixin):
+class Transfer(DictMixin, object):
     """ Main class with wich the data handling object is instantiated.
 
     It is a MutableMapping and a factory.

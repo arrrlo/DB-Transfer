@@ -152,7 +152,7 @@ class Redis(Adapter):
         return data
 
 
-class RedisKeys:
+class RedisKeys(object):
     """ Used only for handling keys in Redis adapter
 
     Redis KEYS command is very dangerous to use in production environment,
@@ -214,7 +214,7 @@ class RedisKeys:
         conn.srem(key, item.split(':')[-1])
 
 
-class RedisDataType:
+class RedisDataType(object):
 
     def __init__(self, adapter, item):
         self._item = item
