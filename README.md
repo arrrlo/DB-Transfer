@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/DB-Transfer.svg)](https://badge.fury.io/py/DB-Transfer)
 
 <p>An easy way to manipulate data using key-value databases like Redis.<br/>
-It is designed to support a number of databases, but currently only Redis is supported.</p>
+It is designed to support a number of databases, but currently Redis and yaml file are supported.</p>
 
 <h2>INSTALL</h2>
 
@@ -230,4 +230,70 @@ rt_1 = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localho
 with rt_1:
     for key in rt_1['arrrlo'].keys():
         del rt_1['arrrlo:' + key]
+```
+
+
+<h2><img src="https://i2.wp.com/d2b12p2f0n03yd.cloudfront.net/wp-content/uploads/2016/03/13105859/yaml.png?fit=128%2C128" width="20" style="margin-right: 20px;" />
+Yaml File Adapter:</h2>
+
+<p>Initially the data from yaml file transferes from file to memory.<br/>
+From there every read, write or delete runs until the sync() method<br/>
+is called. Then the data from memory is transfered to yaml file.<br/>
+sync() method could be called using context manager or manually.</p>
+
+<h3>Define path to yaml file using environment variable</h3>
+<p>Very handy when using in docker containers.</p>
+
+```python
+from db_transfer import Transfer, sent_env
+
+os.environ['YAML_FILE_PATH'] = '/path/to/yaml/file.yaml'
+
+@sent_env('yaml', 'FILE_LOCAL', 'YAML_FILE_PATH')
+class YamlFileTransfer(Transfer):
+
+    def __init__(self, prefix=None, namespace=None):
+        super().__init__(prefix=str(prefix), namespace=namespace, adapter_name='yaml')
+```
+
+<h3>Define path to yaml file using class parameter</h3>
+
+```python
+class YamlFileTransfer(Transfer):
+
+    def __init__(self, prefix, namespace, yaml_file_path):
+        super().__init__(prefix=str(prefix), namespace=namespace, adapter_name='yaml')
+
+        self.set_env('FILE_LOCAL', yaml_file_path)
+```
+
+<h3>Write and delete data</h3>
+<p>Data could be written using context manager or sync() method.</p>
+
+```python
+yt = YamlFileTransfer(prefix='my_prefix', namespace='my_namespace', yaml_file_path='/path/')
+
+with yt:
+    yt['my_key_1'] = 'some_string'
+
+yt['my_key_2'] = 'some_string'
+yt.sync()
+
+with yt:
+    del yt['my_key_1']
+
+del yt['my_key_2']
+yt.sync()
+```
+
+<h3>Real life examples</h3>
+
+<p>Backup user data from Redis to yaml file:</p>
+
+```python
+rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
+yt = YamlFileTransfer(prefix='my_prefix', namespace='my_namespace', yaml_file_path='/path/')
+
+for key in rt.keys():
+    yt[key] = rt[key]
 ```
