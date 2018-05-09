@@ -304,4 +304,20 @@ yt = YamlFileTransfer(prefix='users', namespace='arrrlo', yaml_file_path='/path/
 
 for key in rt.keys():
     yt[key] = rt[key]
+
+# or:
+
+rt = RedisTransfer(prefix='my_prefix:my_namespace', namespace='arrrlo', host='localhost', port=6379, db=0)
+yt = YamlFileTransfer(prefix='my_prefix:my_namespace', namespace='arrrlo', yaml_file_path='/path/')
+
+for key in rt.keys():
+    yt[key] = rt[key]
+
+# or:
+
+rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
+yt = YamlFileTransfer(prefix='my_prefix:my_namespace', namespace='arrrlo', yaml_file_path='/path/')
+
+for key in rt.keys():
+    yt[key] = rt['arrrlo:' + key]
 ```
