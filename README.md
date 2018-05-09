@@ -233,7 +233,7 @@ with rt_1:
 ```
 
 
-<h2><img src="https://i2.wp.com/d2b12p2f0n03yd.cloudfront.net/wp-content/uploads/2016/03/13105859/yaml.png?fit=128%2C128" width="20" style="margin-right: 20px;" />
+<h2><img src="https://i2.wp.com/d2b12p2f0n03yd.cloudfront.net/wp-content/uploads/2016/03/13105859/yaml.png?fit=128%2C128" width="26" style="margin-right: 20px;" />
 Yaml File Adapter:</h2>
 
 <p>Initially the data from yaml file transferes from file to memory.<br/>
