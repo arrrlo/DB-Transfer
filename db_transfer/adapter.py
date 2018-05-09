@@ -1,6 +1,5 @@
 class Adapter(object):
     """ Mixin class with main adapter functionalities.
-
     Every adapter that uses this mixin needs to define getter and setter methods.
     """
 
@@ -31,27 +30,8 @@ class Adapter(object):
             Adapter._connection[key] = self.connect(*args, **kwargs)
         return Adapter._connection[key]
 
-    @staticmethod
-    def store(transfer, file_contents=None):
-        global key
-        global contents
-
-        def rek(val):
-            global key
-            global contents
-            if type(val) == dict:
-                for k, v in val.items():
-                    if key == '':
-                        key += k
-                    else:
-                        key += ':' + k
-                    rek(v)
-                    key = ':'.join(key.split(':')[:-1])
-            else:
-                contents[key] = val
-
-        contents = {}
-        key = ''
-        rek(file_contents)
-
-        return contents
+    def context_entered(self, entered=None):
+        if entered is None:
+            return self._context_entered
+        else:
+            self._context_entered = entered

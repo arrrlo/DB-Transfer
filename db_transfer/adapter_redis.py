@@ -128,12 +128,6 @@ class Redis(Adapter):
     def __setitem__(self, key, value):
         self.set(key, value)
 
-    def context_entered(self, entered=None):
-        if entered is None:
-            return self._context_entered
-        else:
-            self._context_entered = entered
-
     def exit(self, exc_type, exc_val, exc_tb):
         self._pipeline.execute()
         self._pipeline.__exit__(exc_type, exc_val, exc_tb)
@@ -150,6 +144,9 @@ class Redis(Adapter):
         for key in keys:
             data.append((key, self.get(key)))
         return data
+
+    def sync(self):
+        pass
 
 
 class RedisKeys(object):

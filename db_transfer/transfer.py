@@ -7,11 +7,12 @@ elif six.PY3:
     from collections import MutableMapping as DictMixin
 
 from db_transfer.adapter_redis import Redis
+from db_transfer.adapter_yaml import YamlFile
 
 
 ADAPTER_CLASSES = {
     'redis': Redis,
-    # number of other adapters
+    'yaml': YamlFile,
 }
 
 
@@ -129,3 +130,6 @@ class Transfer(DictMixin, object):
     def __iter__(self):
         for key in self.adapter.keys():
             yield (key, self.__getitem__(key))
+
+    def __del__(self):
+        pass

@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name='DB Transfer',
-    version="0.4.5",
+    version="0.5.0",
 
     description='An easy way to fetch and store data from and store to key-value databases like Redis.',
     long_description=readme(),
@@ -32,14 +32,16 @@ setup(
 
     packages=['db_transfer'],
     install_requires=[
+        'click~=6.3',
         'redis~=2.10',
         'ujson~=1.35',
-        'six~=1.11.0'
+        'six~=1.11.0',
+        'PyYAML~=3.12'
     ],
 
     entry_points={
         'console_scripts': [
-            'dbtransfer=transfer.cli:cli'
+            'dbtransfer=db_transfer.cli:cli'
         ],
     },
 
