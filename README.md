@@ -294,6 +294,14 @@ yt.sync()
 rt = RedisTransfer(prefix='my_prefix', namespace='my_namespace', host='localhost', port=6379, db=0)
 yt = YamlFileTransfer(prefix='my_prefix', namespace='my_namespace', yaml_file_path='/path/')
 
+for key in rt['arrrlo'].keys():
+    yt['arrrlo:' + key] = rt['arrrlo:' + key]
+
+# or (depends on how you use prefix and namespace):
+
+rt = RedisTransfer(prefix='users', namespace='arrrlo', host='localhost', port=6379, db=0)
+yt = YamlFileTransfer(prefix='users', namespace='arrrlo', yaml_file_path='/path/')
+
 for key in rt.keys():
     yt[key] = rt[key]
 ```
