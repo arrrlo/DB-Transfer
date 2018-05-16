@@ -129,9 +129,10 @@ class Redis(Adapter):
         self.set(key, value)
 
     def exit(self, exc_type, exc_val, exc_tb):
-        self._pipeline.execute()
-        self._pipeline.__exit__(exc_type, exc_val, exc_tb)
-        self._pipeline = None
+        if self._pipeline:
+            self._pipeline.execute()
+            self._pipeline.__exit__(exc_type, exc_val, exc_tb)
+            self._pipeline = None
         self.context_entered(False)
 
     def keys(self):
