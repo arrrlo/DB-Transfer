@@ -15,7 +15,7 @@ pip install DB-Transfer
 
 <p>There are an adapter class for every database.<br/>
 After instantiating Python Transfer using certain adapter_name, we can manipulate the<br/>
-data from key-value database just like dictionaries: `transfer[key] = value</p>
+data from key-value database just like dictionaries: `transfer[key] = value`</p>
 
 <h2>Keys</h2>
 
