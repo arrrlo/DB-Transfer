@@ -7,11 +7,13 @@ elif six.PY3:
     from collections import MutableMapping as DictMixin
 
 from db_transfer.adapter_redis import Redis
+from db_transfer.adapter_mongo import Mongo
 from db_transfer.adapter_yaml import YamlFile
 
 
 ADAPTER_CLASSES = {
     'redis': Redis,
+    'mongo': Mongo,
     'yaml': YamlFile,
 }
 

@@ -25,7 +25,7 @@ class Redis(Adapter):
         self.PORT = port or self._transfer.get_env('PORT')
         self.DB = db or self._transfer.get_env('DB')
 
-        conn_key = str(self.HOST) + str(self.PORT) + str(self.DB)
+        conn_key = '{}{}{}'.format(str(self.HOST), str(self.PORT), str(self.DB))
         if not self.connection.get(conn_key):
             self.connection[conn_key] = redis.StrictRedis(host=self.HOST,
                                                           port=self.PORT,
@@ -129,9 +129,10 @@ class Redis(Adapter):
         self.set(key, value)
 
     def exit(self, exc_type, exc_val, exc_tb):
-        self._pipeline.execute()
-        self._pipeline.__exit__(exc_type, exc_val, exc_tb)
-        self._pipeline = None
+        if self._pipeline:
+            self._pipeline.execute()
+            self._pipeline.__exit__(exc_type, exc_val, exc_tb)
+            self._pipeline = None
         self.context_entered(False)
 
     def keys(self):
@@ -167,13 +168,13 @@ class RedisKeys(object):
     def all(self, start_key=None):
         def search_keys(k, keyset):
             if k:
-                search_key = prefix + ':' + k
+                search_key = '{}:{}'.format(prefix, k)
             else:
                 search_key = prefix
 
             for key in conn.smembers(search_key):
                 if k:
-                    key = k + ':' + key
+                    key = '{}:{}'.format(k, key)
                 if key[-5:] == ':keys':
                     keyset = search_keys(key[:-5], keyset)
                 else:
@@ -198,15 +199,15 @@ class RedisKeys(object):
             while splitted_item:
                 sufix = splitted_item.pop(0)
                 if splitted_item:
-                    pipe.sadd(prefix, sufix + ':keys')
+                    pipe.sadd(prefix, '{}:keys'.format(sufix))
                 else:
                     pipe.sadd(prefix, sufix)
-                prefix += ':' + sufix
+                prefix = '{}:{}'.format(prefix, sufix)
             pipe.execute()
 
     def remove(self, item):
         conn = self._transfer.adapter.conn()
-        prefix = self.prefix + ':' + item
+        prefix = '{}:{}'.format(self.prefix, item)
         key = ':'.join(prefix.split(':')[:-1])
         conn.srem(key, item.split(':')[-1])
 

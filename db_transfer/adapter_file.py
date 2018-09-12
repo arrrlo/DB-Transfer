@@ -20,9 +20,9 @@ class File(Adapter):
         self.FILE_LOCAL = self._transfer.get_env('FILE_LOCAL')
 
         if not self.FILE_LOCAL:
-            filename = str(self._transfer.prefix) + '_' + \
-                str(self._transfer.namespace) + '.' + \
-                str(self.file_extension)
+            filename = '{}_{}.{}'.format(str(self._transfer.prefix),
+                                         str(self._transfer.namespace),
+                                         str(self.file_extension))
             self.FILE_LOCAL = os.path.join(os.path.expanduser("~"), filename)
 
         dirs = os.path.dirname(self.FILE_LOCAL)
@@ -51,9 +51,9 @@ class File(Adapter):
             if type(val) == dict:
                 for k, v in val.items():
                     if key == '':
-                        key += k
+                        key = k
                     else:
-                        key += ':' + k
+                        key = '{}:{}'.format(key, k)
                     rek(v, contents, key)
                     key = ':'.join(key.split(':')[:-1])
             else:
@@ -67,8 +67,6 @@ class File(Adapter):
     def transform_to_native_dict(self):
         def keyer(dat):
             k = keys.pop(0)
-            #print(dat, k)
-            # print(type(dat))
             if not k in dat:
                 dat[k] = {}
             if len(keys) > 0 and isinstance(dat[k], dict):
@@ -105,7 +103,7 @@ class File(Adapter):
 
     def keys(self):
         keyset = []
-        key_prefix = File.key_prefix(self._transfer) + ':'
+        key_prefix = '{}:'.format(File.key_prefix(self._transfer))
         return [k.replace(key_prefix, '') for k in self.conn().keys()]
 
     def custom_items(self):
