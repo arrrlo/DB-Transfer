@@ -1,0 +1,26 @@
+data:
+  namespace_1:
+    hash_key:
+      doo:
+        goo: gar
+      foo: bar
+      zoo:
+      - 1
+      - 2
+      - 3
+      - foo: bar
+    key_1: !!set
+      list_element_1: null
+      list_element_2: null
+    key_2:
+      key_3: value
+      key_5: value
+    key_3:
+      key_4:
+      - - list_element_1
+        - list_element_2
+    key_4: value
+    key_5:
+    - foo: bar
+      key: value
+    - key: value

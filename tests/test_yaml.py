@@ -1,8 +1,6 @@
 import os
 import pytest
-import fakeredis
 
-from db_transfer.adapter_redis import Redis
 from db_transfer.transfer import Transfer, sent_env
 
 
@@ -102,6 +100,5 @@ def test_yaml_keys(yaml_transfer_write, yaml_transfer_read):
         del yaml_transfer_write['key_2:key_7:key_9']
 
     assert yaml_transfer_read.keys() == ['hash_key:doo:goo', 'hash_key:foo', 'hash_key:zoo',
-                                         'key_1', 'key_2:key_3', 'key_2:key_5',
-                                         'key_2:key_7:key_8', 'key_3:key_4',
+                                         'key_1', 'key_2:key_3', 'key_2:key_5', 'key_3:key_4',
                                          'key_4', 'key_5', 'key_1:key_2', 'hash_key']

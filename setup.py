@@ -8,14 +8,15 @@ def readme():
 
 setup(
     name='DB Transfer',
-    version="0.5.1",
+    version="0.5.2",
 
-    description='An easy way to fetch and store data from and store to key-value databases like Redis.',
+    description='An easy way to fetch and store data '
+                'from and store to key-value databases like Redis.',
     long_description=readme(),
     long_description_content_type='text/markdown',
 
     url='https://github.com/arrrlo/db-transfer',
-    licence='MIT',
+    license='MIT',
 
     author='Ivan Arar',
     author_email='ivan.arar@gmail.com',
@@ -26,7 +27,7 @@ setup(
         'Topic :: Software Development :: Build Tools',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     keywords='database, redis, transfer, migration',
 
@@ -36,7 +37,7 @@ setup(
         'redis~=2.10',
         'ujson~=1.35',
         'six~=1.11.0',
-        'PyYAML~=3.12',
+        'PyYAML==4.2b4',
         'pymongo~=3.7.0'
     ],
 
