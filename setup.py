@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name='DB Transfer',
-    version="0.5.3",
+    version="0.5.4",
 
     description='An easy way to fetch and store data '
                 'from and store to key-value databases like Redis.',
@@ -37,7 +37,7 @@ setup(
         'redis>=2.10',
         'ujson>=1.35',
         'six>=1.12.0',
-        'PyYAML>=4.2b4'
+        'PyYAML>=5.1.2'
     ],
 
     entry_points={
