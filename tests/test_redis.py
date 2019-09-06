@@ -46,21 +46,21 @@ def test_redis_string(redis_transfer):
 
 
 def test_redis_list(redis_transfer):
-    redis_transfer['key_1:key_2'] = ['list_element_1', 'list_element_2']
+    redis_transfer['key_6:key_7'] = ['list_element_1', 'list_element_2']
 
     with redis_transfer:
-        redis_transfer['key_3:key_4'] = [['list_element_1', 'list_element_2']]
-        redis_transfer['key_5'] = [{'key': 'value', 'foo': 'bar'}, {'key': 'value'}]
+        redis_transfer['key_8:key_9'] = [['list_element_1', 'list_element_2']]
+        redis_transfer['key_10'] = [{'key': 'value', 'foo': 'bar'}, {'key': 'value'}]
 
-    assert list(redis_transfer['key_1:key_2']) == ['list_element_1', 'list_element_2']
-    assert list(redis_transfer['key_3:key_4']) == [['list_element_1', 'list_element_2']]
-    assert list(redis_transfer['key_5']) == [{'key': 'value', 'foo': 'bar'}, {'key': 'value'}]
+    assert list(redis_transfer['key_6:key_7']) == ['list_element_1', 'list_element_2']
+    assert list(redis_transfer['key_8:key_9']) == [['list_element_1', 'list_element_2']]
+    assert list(redis_transfer['key_10']) == [{'key': 'value', 'foo': 'bar'}, {'key': 'value'}]
 
 
 def test_redis_set(redis_transfer):
-    redis_transfer['key_1:key_2'] = set(['list_element_1', 'list_element_2'])
+    redis_transfer['key_11:key_12'] = set(['list_element_1', 'list_element_2'])
 
-    assert set(redis_transfer['key_1:key_2']) == {'list_element_1', 'list_element_2'}
+    assert set(redis_transfer['key_11:key_12']) == {'list_element_1', 'list_element_2'}
 
 
 def test_redis_hash(redis_transfer):
@@ -93,22 +93,15 @@ def test_redis_delete(redis_transfer):
 
 
 def test_redis_keys(redis_transfer):
-    redis_transfer['key_1'] = 'value'
-    redis_transfer['key_2:key_3'] = 'value'
-    redis_transfer['key_2:key_4'] = 'value'
-    redis_transfer['key_2:key_5:key_6'] = 'value'
-    redis_transfer['key_2:key_7:key_8'] = 'value'
-    redis_transfer['key_2:key_7:key_9'] = 'value'
+    assert redis_transfer.keys() == ['hash_key', 'key_1', 'key_10',
+                                     'key_11:key_12', 'key_2:key_3',
+                                     'key_2:key_5', 'key_4', 'key_6:key_7',
+                                     'key_8:key_9']
+    assert redis_transfer['key_2'].keys() == ['key_2:key_3', 'key_2:key_5']
 
-    assert redis_transfer.keys() == ['key_1', 'key_2:key_3', 'key_2:key_4',
-                                     'key_2:key_5:key_6', 'key_2:key_7:key_8',
-                                     'key_2:key_7:key_9']
-    assert redis_transfer['key_2'].keys() == ['key_2:key_3', 'key_2:key_4', 'key_2:key_5:key_6',
-                                              'key_2:key_7:key_8', 'key_2:key_7:key_9']
-    assert redis_transfer['key_2:key_7'].keys() == ['key_2:key_7:key_8', 'key_2:key_7:key_9']
+    del redis_transfer['key_2:key_3']
+    del redis_transfer['key_2:key_5']
 
-    del redis_transfer['key_2:key_4']
-    del redis_transfer['key_2:key_7:key_9']
-
-    assert redis_transfer['key_2'].keys() == ['key_2:key_3', 'key_2:key_5:key_6',
-                                              'key_2:key_7:key_8', ]
+    assert redis_transfer.keys() == ['hash_key', 'key_1', 'key_10',
+                                     'key_11:key_12', 'key_4', 'key_6:key_7',
+                                     'key_8:key_9']
