@@ -9,7 +9,7 @@ class YamlFile(File):
 
     def load_file(self):
         with open(self.FILE_LOCAL, "rb+") as _file:
-            file_contents = yaml.load(_file.read())
+            file_contents = yaml.load(_file.read(), Loader=yaml.FullLoader)
         return file_contents
 
     def dump_file(self, contents):
