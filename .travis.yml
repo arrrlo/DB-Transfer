@@ -11,6 +11,7 @@ python:
 
 script:
   - pip install .
+  - pip install -r test_requirements.txt
   - pytest -vvv
 
 deploy:
