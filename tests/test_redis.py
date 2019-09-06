@@ -10,7 +10,7 @@ from db_transfer.transfer import Transfer, sent_env
 def fake_redis(monkeypatch):
     fake_redis = lambda *args, **kwargs: fakeredis.FakeStrictRedis(decode_responses=True)
     monkeypatch.setattr(Redis, 'connect', fake_redis)
-    fake_redis().flushall()
+    #fake_redis().flushall()
     return fake_redis
 
 
