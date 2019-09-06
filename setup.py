@@ -36,7 +36,7 @@ setup(
         'click>=6.3',
         'redis>=2.10',
         'ujson>=1.35',
-        'six>=1.11.0',
+        'six>=1.12.0',
         'PyYAML>=4.2b4'
     ],
 

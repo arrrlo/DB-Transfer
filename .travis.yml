@@ -10,8 +10,8 @@ python:
   - 3.8-dev
 
 script:
-  - pip install .
   - pip install -r test_requirements.txt
+  - pip install .
   - pytest -vvv
 
 deploy:
