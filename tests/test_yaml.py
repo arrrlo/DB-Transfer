@@ -92,13 +92,3 @@ def test_yaml_delete(yaml_transfer_write, yaml_transfer_read):
         del yaml_transfer_write['some_key_1']
 
     assert yaml_transfer_read['some_key_1'] is None
-
-
-def test_yaml_keys(yaml_transfer_write, yaml_transfer_read):
-    with yaml_transfer_write:
-        del yaml_transfer_write['key_2:key_4']
-        del yaml_transfer_write['key_2:key_7:key_9']
-
-    assert yaml_transfer_read.keys() == ['hash_key:doo:goo', 'hash_key:foo', 'hash_key:zoo',
-                                         'key_1', 'key_2:key_3', 'key_2:key_5', 'key_3:key_4',
-                                         'key_4', 'key_5', 'key_1:key_2', 'hash_key']
