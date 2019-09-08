@@ -9,7 +9,6 @@ def readme():
 setup(
     name='DB Transfer',
     version="0.5.6",
-
     description='An easy way to fetch and store data '
                 'from and store to key-value databases like Redis.',
     long_description=readme(),
