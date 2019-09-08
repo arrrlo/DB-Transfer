@@ -55,7 +55,7 @@ class Redis(Adapter):
         _type = conn.type(key)
 
         if _type == 'string':
-            return String(self, item)
+            return str(String(self, item))
         elif _type == 'list':
             return List(self, item)
         elif _type == 'hash':
@@ -230,10 +230,7 @@ class String(RedisDataType):
 
     def __str__(self):
         _str = self._conn.get(self._key)
-        try:
-            return int(_str)
-        except ValueError:
-            return str(_str)
+        return str(_str)
 
     __repr__ = __str__
 
