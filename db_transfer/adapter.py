@@ -3,8 +3,6 @@ class Adapter(object):
     Every adapter that uses this mixin needs to define getter and setter methods.
     """
 
-    _connection = {}
-
     @staticmethod
     def key_prefix(transfer):
         prefix_list = []
@@ -25,10 +23,7 @@ class Adapter(object):
         return ':'.join(key_list)
 
     def conn(self, *args, **kwargs):
-        key = Adapter.key(self._transfer, self._transfer.adapter_name)
-        if not Adapter._connection.get(key):
-            Adapter._connection[key] = self.connect(*args, **kwargs)
-        return Adapter._connection[key]
+        return self.connect(*args, **kwargs)
 
     def context_entered(self, entered=None):
         if entered is None:

@@ -10,8 +10,6 @@ class Redis(Adapter):
     It connects to Redis database.
     """
 
-    connection = {}
-
     def __init__(self, transfer=None):
         self._transfer = transfer
         self.HOST = None
@@ -19,19 +17,19 @@ class Redis(Adapter):
         self.DB = None
         self.context_entered(False)
         self._pipeline = None
+        self.connection = None
 
     def connect(self, host=None, port=None, db=None):
         self.HOST = host or self._transfer.get_env('HOST')
         self.PORT = port or self._transfer.get_env('PORT')
         self.DB = db or self._transfer.get_env('DB')
 
-        conn_key = '{}{}{}'.format(str(self.HOST), str(self.PORT), str(self.DB))
-        if not self.connection.get(conn_key):
-            self.connection[conn_key] = redis.StrictRedis(host=self.HOST,
-                                                          port=self.PORT,
-                                                          db=self.DB,
-                                                          decode_responses=True)
-        return self.connection[conn_key]
+        if not self.connection:
+            self.connection = redis.StrictRedis(
+                host=self.HOST, port=self.PORT, db=self.DB,
+                decode_responses=True
+            )
+        return self.connection
 
     @property
     def _keys(self):
@@ -73,10 +71,10 @@ class Redis(Adapter):
                 self._pipeline = conn.pipeline()
             conn = self._pipeline
 
-        if type(value) in [str, int, None, True, False]:
+        if type(value) in [str, int, None, True, False, String]:
             conn.set(key, value)
 
-        elif type(value) in [list, tuple]:
+        elif type(value) in [list, tuple, List]:
             lst = []
             for itm in value:
                 if type(itm) in [list, set, dict]:
@@ -85,7 +83,7 @@ class Redis(Adapter):
                     lst.append(itm)
             conn.rpush(key, *lst)
 
-        elif type(value) is dict:
+        elif type(value) in [dict, Hash]:
             dct = {}
             for k, val in value.items():
                 if type(val) in [list, set, dict]:
@@ -94,7 +92,7 @@ class Redis(Adapter):
                     dct[k] = val
             conn.hmset(key, dct)
 
-        elif type(value) is set:
+        elif type(value) in [set, Set]:
             lst = []
             for itm in value:
                 if type(itm) in [list, set, dict]:

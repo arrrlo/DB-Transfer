@@ -57,13 +57,12 @@ class Transfer(DictMixin, object):
     Check the example at the bottom to see how it is used.
     """
 
-    adapter_vars = {}
-
     def __init__(self, prefix='data', namespace=None, adapter_name=None):
         self.adapter_name = str(adapter_name)
         self.adapter_object = None
         self.prefix = prefix
         self.data_for(namespace)
+        self.adapter_vars = {}
 
     def set_env(self, adapter_var_name, value):
         if self.__class__.__name__ not in self.adapter_vars:
