@@ -4,7 +4,7 @@ import six
 if six.PY2:
     from UserDict import DictMixin
 elif six.PY3:
-    from collections import MutableMapping as DictMixin
+    from collections.abc import MutableMapping as DictMixin
 
 from db_transfer.adapter_redis import Redis
 from db_transfer.adapter_yaml import YamlFile
