@@ -32,7 +32,7 @@ setup(
 
     packages=['db_transfer'],
     install_requires=[
-        'click>=8.1',
+        'click>=7.1',
         'redis>=2.10',
         'ujson>=1.35',
         'six>=1.12.0',
